@@ -93,22 +93,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 .setRole("assistant")
                 .setContent(answer));
 
-        Long messageLength = 0L;
-        for(Message historyMessage: currentMessage){
-            messageLength += historyMessage.getContent().length();
-        }
-        if (messageLength >= 3000){
-            this.context = new ArrayList<>();
-            messageList.addMessage(getCharacterName()
-                    , getAvatar()
-                    , answer + "(聊天历史过长，历史记忆已清除)", false);
-        }else{
-            this.context = currentMessage;
-            messageList.addMessage(getCharacterName()
-                    , getAvatar()
-                    , answer
-                    , false);
-        }
+        /* 上下文最多保留8句 */
+        currentMessage = currentMessage.size() > 8
+                ? currentMessage.subList(currentMessage.size() - 8, currentMessage.size())
+                : currentMessage;
+        this.context = new ArrayList<>(currentMessage);
+        messageList.addMessage(getCharacterName()
+                , getAvatar()
+                , answer
+                , false);
         log.info("IP: [{}], 问题: [{}], 回答完毕: [{}]", RequestUtil.getRequestIp(), text, answer);
 
         saveSession();
