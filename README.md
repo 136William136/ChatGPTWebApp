@@ -13,7 +13,7 @@
 ## Running the application
 
 启动项目 -> http://localhost:8080
-有些API供应商不支持大陆访问，如果要访问可能需要海外的网络
+有些API供应商不支持大陆访问，如果要访问可能需要海外的网络环境 / 海外的服务器
 
 ## Deploying to Production
 生产模式打包 mvnw clean package -Pproduction`
