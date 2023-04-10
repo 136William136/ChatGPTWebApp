@@ -12,16 +12,16 @@
 
 ## Running the application
 
-启动项目 -> http://localhost:8080
+启动项目 直接运行Application.java 登录页面为 http://localhost:8080
 有些API供应商不支持大陆访问，如果要访问可能需要海外的网络环境 / 海外的服务器
 
 ## Deploying to Production
 生产模式打包 mvnw clean package -Pproduction`
-将target目录下打包的mychatbot-1.0-SNAPSHOT.jar部署在服务器上，并创建同级目录/config, 把application.yml和application-dev.yml放入 （可以只用一个）
+将target目录下打包的mychatbot-1.0-SNAPSHOT.jar部署在服务器上，并创建同级目录/config, 把application.yml和application-dev.yml放入
 用java -jar mychatbot-1.0-SNAPSHOT.jar运行程序
 
 ##其他
-1. 项目中默认限制了上下文长度为3000字，这个可以自行调节
+1. 项目中默认限制了上下文长度为最近的8次对话，这个可以自行调节
 2. 代码写的比较粗糙，例如样式的设置可以尽可能地写在css里
 
 ##Demo
