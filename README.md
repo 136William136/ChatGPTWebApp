@@ -1,13 +1,15 @@
 # My App
 
-项目基于Java 17和Open AI's 的API，仅供代码学习使用，禁止商用
+项目基于Java 17以及Vaadin框架，调用AI回复需要使用Open AI的API Key，可以去OpenAI的官网获取
 
+该项目做了扩展，可以支持其他的AI接口快速接入，例如该项目中的BaiduResponseServiceImpl
+
+该项目仅供代码学习交流，禁止商用以及其他恶意使用行为
 
 ## Requirements
 
-你需要注册一个OpenAI的key并放入application-dev.yml -> service.key.openai
+你需要注册一个OpenAI的API key并放入application-dev.yml -> service.key.openai
 
-项目做了扩展，可以轻易的接入其他的AI，参数为上下文信息
 ## Running the application
 
 启动项目 -> http://localhost:8080
@@ -19,8 +21,8 @@
 用java -jar mychatbot-1.0-SNAPSHOT.jar运行程序
 
 ##其他
-1. 项目中默认限制了上下文长度为3000字，这个自己调节
-2. 代码写的比较粗糙，样式的设置尽可能写在css里
+1. 项目中默认限制了上下文长度为3000字，这个可以自行调节
+2. 代码写的比较粗糙，例如样式的设置可以尽可能地写在css里
 
 ##Demo
 ![image](https://user-images.githubusercontent.com/128681247/230880488-bc3ca29d-d728-4425-9240-1fab43570eac.png)
