@@ -1,0 +1,36 @@
+server:
+  port : ${PORT:8080}
+logging:
+  level:
+    org:
+      atmosphere : warn
+spring:
+  messages:
+    encoding: UTF-8
+  mustache:
+    check-template-location : false
+  jpa.defer-datasource-initialization : true
+
+# Launch the default browser when starting the application in development mode
+vaadin:
+  launch-browser : true
+# To improve the performance during development.
+# For more information https://vaadin.com/docs/flow/spring/tutorial-spring-configuration.html#special-configuration-parameters
+  whitelisted-packages : com.vaadin,org.vaadin,dev.hilla,com.example.application
+
+service:
+  key:
+    openai: openaikey123123
+  response:
+    default: '{"小王":"对不起，我不允许透露有关小王的任何消息"}'
+  prompt:
+    defaultChatRoom: "我希望你在接下来的对话中扮演小王。"
+    philChatRoom: "我希望你通过角色扮演，在接下来的对话中担任专业的哲学老师。"
+  model:
+    defaultChatRoom: openai:gpt-3.5-turbo
+    philChatRoom: baidu:test
+
+
+
+
+
