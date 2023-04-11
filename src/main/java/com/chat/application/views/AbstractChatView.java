@@ -72,9 +72,9 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
     @Override
     public void sendMessage(){
         /* 上下文最多保留15句 */
-        if (this.context.size() > 20){
+        if (this.context.size() > 15){
             List<Message> tmpMessages = this.context
-                    .subList(this.context.size() - 4
+                    .subList(this.context.size() - 15
                             , this.context.size());
             this.context = new ArrayList<>(tmpMessages);
         }
