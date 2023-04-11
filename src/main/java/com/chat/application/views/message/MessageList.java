@@ -2,10 +2,13 @@ package com.chat.application.views.message;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 
 import java.util.ArrayList;
@@ -57,9 +60,8 @@ public class MessageList extends Div {
             }else{
                 Label textLabel = new Label();
                 String textContent = textFields[i];
-                if (textContent.startsWith("html")){
-                    textContent = textContent.replaceAll("\"","&quot")
-                            .replaceAll("&","&amp;")
+                if (textContent.startsWith("html") || textContent.startsWith("<!DOCTYPE html>")){
+                    textContent = textContent
                             .replaceAll("<","&lt;")
                             .replaceAll(">","&gt;");
                 }
@@ -67,6 +69,13 @@ public class MessageList extends Div {
                 String content = "<pre style='background-color:"+backgroundColor+"'>" +
                         "<code style='background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
                 textLabel.getElement().setProperty("innerHTML",content);
+                Button copyButton = new Button("copy code", VaadinIcon.COPY.create());
+
+                String copyContent = textFields[i];
+                copyButton.addClickListener(event -> {
+                    UI.getCurrent().getPage().executeJs("navigator.clipboard.writeText($0)",copyContent);
+                });
+                componentList.add(copyButton);
                 componentList.add(textLabel);
             }
         }
