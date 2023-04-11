@@ -17,6 +17,7 @@ import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -76,21 +77,17 @@ public class OpenAiEventSourceListener extends EventSourceListener {
         }else{
             try {
                 /* 执行结束 */
-                Message question = asyncStatusInfo.messageList
-                        .get(asyncStatusInfo.messageList.size() - 1);
-                asyncStatusInfo.messageList
+                Message question = asyncStatusInfo.getMessageList()
+                        .get(asyncStatusInfo.getMessageList().size() - 1);
+                asyncStatusInfo.getMessageList()
                         .add(new Message().setRole("assistant").setContent(fullResult));
                 asyncStatusInfo.getUi().getSession()
                         .setAttribute(asyncStatusInfo.getUiContextKey()
-                                , asyncStatusInfo.messageList);
+                                , asyncStatusInfo.getMessageList());
 
-                log.info("问题: [{}], 答案: [{}]", question.getContent(), fullResult);
-                /* 上下文最多保留10句 */
-                asyncStatusInfo.messageList = asyncStatusInfo.messageList.size() > 20
-                        ? asyncStatusInfo.messageList
-                        .subList(asyncStatusInfo.messageList.size() - 20
-                                , asyncStatusInfo.messageList.size())
-                        : asyncStatusInfo.messageList;
+                log.info("IP:[{}], 问题: [{}], 答案: [{}]",asyncStatusInfo.getIp()
+                        , question.getContent()
+                        , fullResult);
             }catch (Exception e){
                 log.error("OpenAI写入结果异常 ",e);
             }finally {

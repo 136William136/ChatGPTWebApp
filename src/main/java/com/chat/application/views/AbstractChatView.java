@@ -7,6 +7,7 @@ import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.Message;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
+import com.chat.application.util.RequestUtil;
 import com.chat.application.views.message.MessageList;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -70,6 +71,13 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     @Override
     public void sendMessage(){
+        /* 上下文最多保留15句 */
+        if (this.context.size() > 20){
+            List<Message> tmpMessages = this.context
+                    .subList(this.context.size() - 4
+                            , this.context.size());
+            this.context = new ArrayList<>(tmpMessages);
+        }
         /* 出现结果前禁用按钮 */
         sendButton.setEnabled(false);
         UI.getCurrent().push();
@@ -106,10 +114,14 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         .setUiContextKey(ContextConst.contextPrefix + getCharacterName())
                         .setButton(sendButton)
                         .setVaadinSession(VaadinSession.getCurrent())
+                        .setIp(RequestUtil.getRequestIp())
                 ;
+
         chatResponseMonitor
                 .getChatResponseService(model.getProvider())
                 .getChatResponseAsync(info);
+
+
     }
 
     @Override

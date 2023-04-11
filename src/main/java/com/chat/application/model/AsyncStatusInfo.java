@@ -13,7 +13,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class AsyncStatusInfo {
 
-    public List<Message> messageList;
+    private List<Message> messageList;
     private String newText;
     private String modelName;
 
@@ -25,5 +25,7 @@ public class AsyncStatusInfo {
     private Button button;
 
     private VaadinSession vaadinSession;
+
+    private String ip;
 
 }
