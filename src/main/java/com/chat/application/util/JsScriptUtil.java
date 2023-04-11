@@ -1,15 +1,20 @@
 package com.chat.application.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class JsScriptUtil {
 
     public static String codeTransfer(String content){
-        String textContent = content;
-        if (textContent.startsWith("html") || textContent.startsWith("<!DOCTYPE html>")){
-            textContent = textContent
+        String pattern = "(.*?)";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(content);
+        if (m.find()){
+            return content
                     .replaceAll("<","&lt;")
                     .replaceAll(">","&gt;");
         }
-        return textContent;
+        return content;
     }
     public static String getCodeContentScript(String textContent){
         String backgroundColor = "#C0C0C0";
