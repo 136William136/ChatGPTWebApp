@@ -127,12 +127,16 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         sendHello();
                     }
                     context.stream().skip(1).forEach(oldMessage -> {
-                        messageList.addMessage("user".equalsIgnoreCase(oldMessage.getRole())
-                                        ? ImageConst.ME.getName()
-                                        : getCharacterName()
-                                ,getAvatar()
+                        String from = "user".equalsIgnoreCase(oldMessage.getRole())
+                                ? ImageConst.ME.getName()
+                                : getCharacterName();
+                        Avatar avatar = "user".equalsIgnoreCase(oldMessage.getRole())
+                                ? ImageUtil.getAvatar(ImageConst.ME)
+                                : getAvatar();
+                        Boolean isCurrent = "user".equalsIgnoreCase(oldMessage.getRole()) ? true : false;
+                        messageList.addMessage(from,avatar
                                 , oldMessage.getContent()
-                                , "user".equalsIgnoreCase(oldMessage.getRole()) ? true : false);
+                                , isCurrent);
                     });
                 }, () -> sendHello());
     }
