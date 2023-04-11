@@ -69,13 +69,13 @@ public class MessageList extends Div {
                 String content = "<pre style='background-color:"+backgroundColor+"'>" +
                         "<code style='background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
                 textLabel.getElement().setProperty("innerHTML",content);
-                Button copyButton = new Button("copy code", VaadinIcon.COPY.create());
-
-                String copyContent = textFields[i];
-                copyButton.addClickListener(event -> {
-                    UI.getCurrent().getPage().executeJs("navigator.clipboard.writeText($0)",copyContent);
-                });
-                componentList.add(copyButton);
+//                Button copyButton = new Button("copy code", VaadinIcon.COPY.create());
+//
+//                String copyContent = textFields[i];
+//                copyButton.addClickListener(event -> {
+//                    UI.getCurrent().getPage().executeJs("navigator.clipboard.writeText($0)",copyContent);
+//                });
+//                componentList.add(copyButton);
                 componentList.add(textLabel);
             }
         }
