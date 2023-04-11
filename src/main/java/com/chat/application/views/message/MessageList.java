@@ -27,8 +27,8 @@ public class MessageList extends Div {
 
     public Span addMessage(String from, Avatar avatar, String text, Boolean isCurrentUser){
 
-        Span fromContainer = new Span(new Text(from));
-        //Span fromContainer = new Span(new Text(""));
+        //Span fromContainer = new Span(new Text(from));
+        Span fromContainer = new Span(new Text(""));
         fromContainer.addClassName(getClass().getSimpleName() + "-name");
 
         //Div textContainer = getTextField(text);
@@ -48,7 +48,6 @@ public class MessageList extends Div {
         }
         Scroller scroller = new Scroller(line);
         scroller.getStyle().set("overflow-x","hidden");
-        scroller.getStyle().set("overflow","hidden");
         add(scroller);
         line.getElement().callJsFunction("scrollIntoView");
         return text1;

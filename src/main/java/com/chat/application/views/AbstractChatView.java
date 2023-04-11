@@ -3,6 +3,7 @@ package com.chat.application.views;
 import com.chat.application.constant.ContextConst;
 import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
+import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.Message;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,10 +37,11 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
     public TextField message = new TextField();
 
     public List<Message> context = new ArrayList<>();
+    public Button sendButton;
 
     public AbstractChatView() {
         message.setPlaceholder("Enter a message... ");
-        Button sendButton = new Button(VaadinIcon.ENTER.create(), buttonClickEvent -> {
+        sendButton = new Button(VaadinIcon.ENTER.create(), buttonClickEvent -> {
             if (!StringUtils.isBlank(message.getValue())){
                 sendMessage();
             }
@@ -49,7 +52,11 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
             clearSession();
         });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(message, sendButton, clearButton);
+        Button refreshButton = new Button(VaadinIcon.REFRESH.create(), buttonClickEvent -> {
+            UI.getCurrent().getPage().reload();
+        });
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(message, sendButton,refreshButton, clearButton);
         horizontalLayout.setWidth("80%");
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
@@ -63,6 +70,9 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     @Override
     public void sendMessage(){
+        /* 出现结果前禁用按钮 */
+        sendButton.setEnabled(false);
+        UI.getCurrent().push();
         /* 获取上下文 */
         String text = message.getValue();
         if (CollectionUtils.isEmpty(this.context)){
@@ -88,14 +98,18 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , ""
                 , false);
 
+        AsyncStatusInfo info = new AsyncStatusInfo().setMessageList(this.context)
+                        .setNewText(text)
+                        .setModelName(model.getModelName())
+                        .setUi(UI.getCurrent())
+                        .setText(text1)
+                        .setUiContextKey(ContextConst.contextPrefix + getCharacterName())
+                        .setButton(sendButton)
+                        .setVaadinSession(VaadinSession.getCurrent())
+                ;
         chatResponseMonitor
                 .getChatResponseService(model.getProvider())
-                .getChatResponseAsync(this.context
-                        , text
-                        , model.getModelName()
-                        , UI.getCurrent()
-                        , text1
-                        , ContextConst.contextPrefix + getCharacterName());
+                .getChatResponseAsync(info);
     }
 
     @Override
