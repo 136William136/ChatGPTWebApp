@@ -1,5 +1,6 @@
 package com.chat.application.views.message;
 
+import com.chat.application.util.JsScriptUtil;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -22,7 +23,8 @@ public class MessageList extends Div {
 
     public void addMessage(String from, Avatar avatar, String text, Boolean isCurrentUser){
 
-        Span fromContainer = new Span(new Text(from));
+        //Span fromContainer = new Span(new Text(from));
+        Span fromContainer = new Span(new Text(""));
         fromContainer.addClassName(getClass().getSimpleName() + "-name");
 
         Div textContainer = getTextField(text);
@@ -47,8 +49,6 @@ public class MessageList extends Div {
     }
 
     public Div getTextField(String text){
-        //Div textContainer = new Div(new Text(text));
-
         List<Component> componentList = new ArrayList<>();
         String[] textFields = text.split("```");
         if (textFields.length % 2 == 0){
@@ -59,27 +59,20 @@ public class MessageList extends Div {
                 componentList.add(new Text(textFields[i]));
             }else{
                 Label textLabel = new Label();
-                String textContent = textFields[i];
-                if (textContent.startsWith("html") || textContent.startsWith("<!DOCTYPE html>")){
-                    textContent = textContent
-                            .replaceAll("<","&lt;")
-                            .replaceAll(">","&gt;");
-                }
-                String backgroundColor = "#C0C0C0";
-                String content = "<pre style='background-color:"+backgroundColor+"'>" +
-                        "<code style='background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
-                textLabel.getElement().setProperty("innerHTML",content);
-//                Button copyButton = new Button("copy code", VaadinIcon.COPY.create());
-//
-//                String copyContent = textFields[i];
-//                copyButton.addClickListener(event -> {
-//                    UI.getCurrent().getPage().executeJs("navigator.clipboard.writeText($0)",copyContent);
-//                });
-//                componentList.add(copyButton);
+                String textContent = JsScriptUtil.codeTransfer(textFields[i]);
+                textLabel.getElement().setProperty("innerHTML",JsScriptUtil.getCodeContentScript(textContent));
+
+                Button copyButton = new Button("", VaadinIcon.COPY.create());
+                String copyContent = textFields[i];
+                copyButton.addClickListener(event -> {
+                    UI.getCurrent().getPage().executeJs(JsScriptUtil.copyContentScript(),copyContent);
+                });
+                componentList.add(copyButton);
                 componentList.add(textLabel);
             }
         }
         return new Div(componentList.toArray(new Component[componentList.size()]));
+
     }
 
 }
