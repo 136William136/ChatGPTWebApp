@@ -25,4 +25,5 @@
 2. 代码写的比较粗糙，例如样式的设置可以尽可能地写在css里
 
 ##Demo
-![image](https://user-images.githubusercontent.com/128681247/230880488-bc3ca29d-d728-4425-9240-1fab43570eac.png)
+![image](https://user-images.githubusercontent.com/128681247/230920139-067e4992-2635-4c91-91e9-81fee1fcc297.png)
+
