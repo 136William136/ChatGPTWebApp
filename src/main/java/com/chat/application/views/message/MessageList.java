@@ -51,9 +51,6 @@ public class MessageList extends Div {
     public Div getTextField(String text){
         List<Component> componentList = new ArrayList<>();
         String[] textFields = text.split("```");
-        if (textFields.length % 2 == 0){
-            return new Div(new Text(text));
-        }
         for(int i=0; i< textFields.length; i++){
             if (i%2 == 0){
                 componentList.add(new Text(textFields[i]));
