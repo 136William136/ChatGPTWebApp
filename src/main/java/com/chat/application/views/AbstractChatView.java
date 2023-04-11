@@ -1,15 +1,16 @@
 package com.chat.application.views;
 
+import com.chat.application.constant.ContextConst;
 import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
 import com.chat.application.model.Message;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
-import com.chat.application.util.RequestUtil;
 import com.chat.application.views.message.MessageList;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -30,7 +31,6 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 {
     @Autowired
     private ChatResponseMonitor chatResponseMonitor;
-    private final String contextPrefix = "context:";
     public MessageList messageList = new MessageList();
     public TextField message = new TextField();
 
@@ -65,17 +65,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
     public void sendMessage(){
         /* 获取上下文 */
         String text = message.getValue();
-        List<Message> currentMessage = new ArrayList<>();
         if (CollectionUtils.isEmpty(this.context)){
-            currentMessage.add(new Message().setRole("user").setContent(getPrompt()));
-            currentMessage.add(new Message().setRole("assistant").setContent("你好！请发一些消息吧"));
-        }else{
-            currentMessage = this.context;
+            this.context.add(new Message().setRole("user").setContent(getPrompt()));
+            this.context.add(new Message().setRole("assistant").setContent("你好！请发一些消息吧"));
         }
-        currentMessage.add(new Message().setRole("user").setContent(text));
+        this.context.add(new Message().setRole("user").setContent(text));
 
         Avatar avatar = ImageUtil.getAvatar(ImageConst.ME);
-        messageList.addMessage(ImageConst.ME.getName()
+        messageList.addMessage(
+                ImageConst.ME.getName()
                 , avatar
                 , text
                 , true);
@@ -84,43 +82,29 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         UI.getCurrent().push();
 
         AiModel model = getModel();
-        String answer = chatResponseMonitor
-                .getChatResponseService(model.getProvider())
-                .getChatResponse(currentMessage
-                        , text, model.getModelName());
-        /* 添加上下文 */
-        currentMessage.add(new Message()
-                .setRole("assistant")
-                .setContent(answer));
-
-        /* 上下文最多保留8句 */
-        currentMessage = currentMessage.size() > 8
-                ? currentMessage.subList(currentMessage.size() - 8, currentMessage.size())
-                : currentMessage;
-        this.context = new ArrayList<>(currentMessage);
-        messageList.addMessage(getCharacterName()
+        Span text1 = messageList.addMessage(
+                getCharacterName()
                 , getAvatar()
-                , answer
+                , ""
                 , false);
-        log.info("IP: [{}], 问题: [{}], 回答完毕: [{}]", RequestUtil.getRequestIp(), text, answer);
 
-        saveSession();
-    }
-
-    private void saveSession(){
-        UI.getCurrent()
-                .getSession()
-                .setAttribute(contextPrefix + getCharacterName(),this.context);
+        chatResponseMonitor
+                .getChatResponseService(model.getProvider())
+                .getChatResponseAsync(this.context
+                        , text
+                        , model.getModelName()
+                        , UI.getCurrent()
+                        , text1
+                        , ContextConst.contextPrefix + getCharacterName());
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.MANUAL);
         /* 设置UI过期时间为5分钟 */
-//        UI.getCurrent().setPollInterval(300);
         Optional.ofNullable(UI.getCurrent()
                         .getSession()
-                        .getAttribute(contextPrefix + getCharacterName()))
+                        .getAttribute(ContextConst.contextPrefix + getCharacterName()))
                 .ifPresentOrElse(historyContext -> {
                     context = (List<Message>) historyContext;
                     if (CollectionUtils.isEmpty(context)){
@@ -141,7 +125,8 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 }, () -> sendHello());
     }
     private void sendHello(){
-        messageList.addMessage(getCharacterName()
+        messageList.addMessage(
+                getCharacterName()
                 , getAvatar()
                 , "你好！请发一些消息吧"
                 , false);
@@ -152,7 +137,7 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         context = new ArrayList<>();
         UI.getCurrent()
                 .getSession()
-                .setAttribute(contextPrefix + getCharacterName(),null);
+                .setAttribute(ContextConst.contextPrefix + getCharacterName(),null);
         sendHello();
     }
 

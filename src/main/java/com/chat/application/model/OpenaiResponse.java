@@ -16,21 +16,10 @@ public class OpenaiResponse extends AiResponse{
     private String model;
 
     private List<Choice> choices;
-
-    private Usage usage;
     @Data
     public static class Choice {
-        private Message message;
+        private Message delta;
         private Integer index;
         private String finish_reason;
-    }
-
-    @Data
-    public class Usage {
-        private Integer prompt_tokens;
-
-        private Integer completion_tokens;
-
-        private Integer total_tokens;
     }
 }

@@ -65,7 +65,7 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
         nav.addItem(new AppNavItem("聊天室", DefaultAbstractChatRoom.class, LineAwesomeIcon.GLOBE_SOLID.create()));
-        nav.addItem(new AppNavItem("哲学聊天室", PhilAbstractChatRoom.class, LineAwesomeIcon.HISTORY_SOLID.create()));
+        nav.addItem(new AppNavItem("聊天室2号", PhilAbstractChatRoom.class, LineAwesomeIcon.HISTORY_SOLID.create()));
         return nav;
     }
 
