@@ -3,6 +3,7 @@ package com.chat.application.views;
 import com.chat.application.constant.ContextConst;
 import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
+import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.Message;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
@@ -88,14 +89,16 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , ""
                 , false);
 
+        AsyncStatusInfo info = new AsyncStatusInfo().setMessageList(this.context)
+                        .setNewText(text)
+                        .setModelName(model.getModelName())
+                        .setUi(UI.getCurrent())
+                        .setText(text1)
+                        .setUiContextKey(ContextConst.contextPrefix + getCharacterName());
+
         chatResponseMonitor
                 .getChatResponseService(model.getProvider())
-                .getChatResponseAsync(this.context
-                        , text
-                        , model.getModelName()
-                        , UI.getCurrent()
-                        , text1
-                        , ContextConst.contextPrefix + getCharacterName());
+                .getChatResponseAsync(info);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.chat.application.service;
 
+import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.Message;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
@@ -10,11 +11,9 @@ import java.util.Map;
 
 public interface ChatResponseService {
 
-    String getChatResponseAsync(List<Message> messageList
-            , String newText, String model, UI ui, Span text, String uiContextKey);
+    String getChatResponseAsync(AsyncStatusInfo asyncStatusInfo);
 
-    String getAiResponseAsync(List<Message> messageList
-            , String model, UI ui, Span text, String uiContextKey);
+    String getAiResponseAsync(AsyncStatusInfo asyncStatusInfo);
 
     String getProviderName();
 

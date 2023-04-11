@@ -1,14 +1,9 @@
 package com.chat.application.listener;
 
-import com.chat.application.constant.ContextConst;
 import com.chat.application.model.Message;
 import com.chat.application.model.OpenaiResponse;
 import com.chat.application.util.JsScriptUtil;
-import com.chat.application.util.RequestUtil;
-import com.chat.application.views.message.MessageList;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
@@ -22,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 @Slf4j
-public class AiEventSourceListener extends EventSourceListener {
+public class OpenAiEventSourceListener extends EventSourceListener {
 
     private UI ui;
 
@@ -38,7 +33,7 @@ public class AiEventSourceListener extends EventSourceListener {
 
     private String uiContextKey;
 
-    public AiEventSourceListener(UI ui, Span text, List<Message> messageList, String uiContextKey){
+    public OpenAiEventSourceListener(UI ui, Span text, List<Message> messageList, String uiContextKey){
         this.ui = ui;
         this.text = text;
         this.messageList = messageList;
@@ -48,7 +43,6 @@ public class AiEventSourceListener extends EventSourceListener {
     public void onEvent(EventSource eventSource, String id, String type, String data) {
         if (!data.equals("[DONE]")){
             try {
-
                 OpenaiResponse response = new ObjectMapper().readValue(data, OpenaiResponse.class);
                 String info = response.getChoices()
                         .get(0)
@@ -57,9 +51,9 @@ public class AiEventSourceListener extends EventSourceListener {
                 //log.info("返回数据: [{}]",info);
                 if (StringUtils.isNotEmpty(info)) {
                     fullResult += info;
-                    if (info.equals("```") && !codeStart){
+                    if (info.startsWith("``") && !codeStart){
                         codeStart = true;
-                    }else if (info.equals("``") && codeStart){
+                    }else if (info.startsWith("``") && codeStart){
                         codeStart = false;
                         String copyContent = new String(codeCache);
                         Label textLabel = new Label();

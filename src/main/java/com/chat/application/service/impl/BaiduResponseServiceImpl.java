@@ -1,5 +1,6 @@
 package com.chat.application.service.impl;
 
+import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.Message;
 import com.chat.application.service.AbstractChatResponseService;
 import com.vaadin.flow.component.Text;
@@ -14,13 +15,13 @@ public class BaiduResponseServiceImpl extends AbstractChatResponseService {
     private String message = "百度AI尚未引入";
 
     @Override
-    public String getChatResponseAsync(List<Message> messageList, String newText, String model, UI ui, Span text, String uiContextKey) {
-        text.add(message);
+    public String getChatResponseAsync(AsyncStatusInfo asyncStatusInfo) {
+        asyncStatusInfo.getText().add(message);
         return null;
     }
 
     @Override
-    public String getAiResponseAsync(List<Message> messageList, String model, UI ui, Span text, String uiContextKey) {
+    public String getAiResponseAsync(AsyncStatusInfo asyncStatusInfo) {
         return message;
     }
     @Override
