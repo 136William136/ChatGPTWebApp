@@ -2,19 +2,18 @@ package com.chat.application.listener;
 
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.OpenaiResponse;
-import com.chat.application.util.JsScriptUtil;
 import com.chat.application.util.UiUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unfbx.chatgpt.entity.chat.Message;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.Component;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class OpenAiEventSourceListener extends EventSourceListener {
@@ -47,17 +46,11 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                         codeStart = true;
                     }else if (info.startsWith("``") && codeStart){
                         codeStart = false;
-                        String copyContent = new String(codeCache);
-                        Label textLabel = new Label();
-                        String textContent = JsScriptUtil.codeTransfer(copyContent);
-                        textLabel.getElement().setProperty("innerHTML",JsScriptUtil.getCodeContentScript(textContent));
-
-                        Button copyButton = new Button("copy", VaadinIcon.COPY.create());
-                        copyButton.addClickListener(event -> {
-                            UI.getCurrent().getPage().executeJs(JsScriptUtil.copyContentScript(),copyContent);
-                        });
-                        copyButton.getStyle().set("color","black");
-                        asyncStatusInfo.getText().add(copyButton, textLabel);
+                        List<Component> componentList = new ArrayList<>();
+                        UiUtil.addCodeComponent(componentList, new String(codeCache));
+                        asyncStatusInfo.getText()
+                                .add(componentList
+                                .toArray(new Component[componentList.size()]));
                         asyncStatusInfo.getUi().push();
                         codeCache = "";
                     }else if (codeStart){
@@ -65,6 +58,8 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                     }else{
                         asyncStatusInfo.getText().add(info);
                         asyncStatusInfo.getUi().push();
+                        /* 控制推送的速率 */
+                        Thread.sleep(100);
                     }
                 }
             } catch (Exception e) {
