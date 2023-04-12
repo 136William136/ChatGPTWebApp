@@ -1,5 +1,6 @@
 package com.chat.application.model;
 
+import com.unfbx.chatgpt.entity.chat.Message;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

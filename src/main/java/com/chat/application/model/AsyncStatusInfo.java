@@ -1,5 +1,6 @@
 package com.chat.application.model;
 
+import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Span;
@@ -15,7 +16,7 @@ public class AsyncStatusInfo {
 
     private List<Message> messageList;
     private String newText;
-    private String modelName;
+    private AiModel model;
 
     private UI ui;
 

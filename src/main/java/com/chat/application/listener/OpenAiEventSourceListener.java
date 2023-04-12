@@ -1,24 +1,20 @@
 package com.chat.application.listener;
 
 import com.chat.application.model.AsyncStatusInfo;
-import com.chat.application.model.Message;
 import com.chat.application.model.OpenaiResponse;
 import com.chat.application.util.JsScriptUtil;
+import com.chat.application.util.UiUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaadin.flow.component.Synchronize;
+import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 public class OpenAiEventSourceListener extends EventSourceListener {
@@ -56,7 +52,7 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                         String textContent = JsScriptUtil.codeTransfer(copyContent);
                         textLabel.getElement().setProperty("innerHTML",JsScriptUtil.getCodeContentScript(textContent));
 
-                        Button copyButton = new Button("", VaadinIcon.COPY.create());
+                        Button copyButton = new Button("copy", VaadinIcon.COPY.create());
                         copyButton.addClickListener(event -> {
                             UI.getCurrent().getPage().executeJs(JsScriptUtil.copyContentScript(),copyContent);
                         });
@@ -75,25 +71,8 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                 log.error("OpenAI响应消息解析失败",e);
             }
         }else{
-            try {
-                /* 执行结束 */
-                Message question = asyncStatusInfo.getMessageList()
-                        .get(asyncStatusInfo.getMessageList().size() - 1);
-                asyncStatusInfo.getMessageList()
-                        .add(new Message().setRole("assistant").setContent(fullResult));
-                asyncStatusInfo.getUi().getSession()
-                        .setAttribute(asyncStatusInfo.getUiContextKey()
-                                , asyncStatusInfo.getMessageList());
-
-                log.info("IP:[{}], 问题: [{}], 答案: [{}]",asyncStatusInfo.getIp()
-                        , question.getContent()
-                        , fullResult);
-            }catch (Exception e){
-                log.error("OpenAI写入结果异常 ",e);
-            }finally {
-                asyncStatusInfo.getButton().setEnabled(true);
-                asyncStatusInfo.getUi().push();
-            }
+            /* 执行结束 */
+            UiUtil.updateCharacter(asyncStatusInfo, fullResult, Message.Role.ASSISTANT);
         }
         asyncStatusInfo.getVaadinSession().getLockInstance().unlock();
     }
@@ -101,14 +80,12 @@ public class OpenAiEventSourceListener extends EventSourceListener {
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response){
         asyncStatusInfo.getVaadinSession().getLockInstance().lock();
-
         asyncStatusInfo.getButton().setEnabled(true);
+        asyncStatusInfo.getText().add("系统繁忙，请稍后再试；可以尝试清空消息或刷新页面");
         asyncStatusInfo.getUi().push();
-        log.error("OpenAI请求失败 ",t);
-        asyncStatusInfo.getText().add("系统繁忙，请稍后再试");
-        asyncStatusInfo.getUi().push();
-
         asyncStatusInfo.getVaadinSession().getLockInstance().unlock();
+        log.error("OpenAI请求失败 [{}]",response, t);
+        eventSource.cancel();
     }
 
 }

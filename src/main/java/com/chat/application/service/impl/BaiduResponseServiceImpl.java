@@ -1,32 +1,24 @@
 package com.chat.application.service.impl;
 
 import com.chat.application.model.AsyncStatusInfo;
-import com.chat.application.model.Message;
 import com.chat.application.service.AbstractChatResponseService;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.html.Span;
+import com.chat.application.util.UiUtil;
+import com.unfbx.chatgpt.entity.chat.Message;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service("baiduResponseServiceImpl")
 public class BaiduResponseServiceImpl extends AbstractChatResponseService {
 
-    private String message = "百度AI尚未引入";
-
+    private String provider = "baidu";
     @Override
-    public String getChatResponseAsync(AsyncStatusInfo asyncStatusInfo) {
-        asyncStatusInfo.getText().add(message);
-        return null;
-    }
-
-    @Override
-    public String getAiResponseAsync(AsyncStatusInfo asyncStatusInfo) {
-        return message;
+    public void getAiResponseAsync(AsyncStatusInfo asyncStatusInfo) {
+        String response = "百度AI尚未引入";
+        asyncStatusInfo.getText().add(response);
+        UiUtil.updateCharacter(asyncStatusInfo, response, Message.Role.ASSISTANT);
     }
     @Override
     public String getProviderName() {
-        return "baidu";
+        return provider;
     }
 
 }

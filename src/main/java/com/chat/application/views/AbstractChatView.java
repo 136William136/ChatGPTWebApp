@@ -4,11 +4,11 @@ import com.chat.application.constant.ContextConst;
 import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
 import com.chat.application.model.AsyncStatusInfo;
-import com.chat.application.model.Message;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
 import com.chat.application.util.RequestUtil;
 import com.chat.application.views.message.MessageList;
+import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
@@ -71,23 +71,24 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     @Override
     public void sendMessage(){
-        /* 上下文最多保留15句 */
-        if (this.context.size() > 15){
-            List<Message> tmpMessages = this.context
-                    .subList(this.context.size() - 15
-                            , this.context.size());
-            this.context = new ArrayList<>(tmpMessages);
-        }
         /* 出现结果前禁用按钮 */
         sendButton.setEnabled(false);
         UI.getCurrent().push();
+
+        /* 上下文最多保留15句 */
+        if (this.context.size() > 10){
+            List<Message> tmpMessages = this.context
+                    .subList(this.context.size() - 10
+                            , this.context.size());
+            this.context = new ArrayList<>(tmpMessages);
+        }
         /* 获取上下文 */
         String text = message.getValue();
         if (CollectionUtils.isEmpty(this.context)){
-            this.context.add(new Message().setRole("user").setContent(getPrompt()));
-            this.context.add(new Message().setRole("assistant").setContent("你好！请发一些消息吧"));
+            this.context.add(Message.builder().role(Message.Role.USER).content(getPrompt()).build());
+            this.context.add(Message.builder().role(Message.Role.ASSISTANT).content("你好！请发一些消息吧").build());
         }
-        this.context.add(new Message().setRole("user").setContent(text));
+        this.context.add(Message.builder().role(Message.Role.USER).content(text).build());
 
         Avatar avatar = ImageUtil.getAvatar(ImageConst.ME);
         messageList.addMessage(
@@ -108,7 +109,7 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
         AsyncStatusInfo info = new AsyncStatusInfo().setMessageList(this.context)
                         .setNewText(text)
-                        .setModelName(model.getModelName())
+                        .setModel(model)
                         .setUi(UI.getCurrent())
                         .setText(text1)
                         .setUiContextKey(ContextConst.contextPrefix + getCharacterName())
@@ -116,11 +117,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         .setVaadinSession(VaadinSession.getCurrent())
                         .setIp(RequestUtil.getRequestIp())
                 ;
-
-        chatResponseMonitor
-                .getChatResponseService(model.getProvider())
-                .getChatResponseAsync(info);
-
+        try {
+            chatResponseMonitor
+                    .getChatResponseService(info)
+                    .getChatResponseAsync(info);
+        }catch (Exception e){
+            log.error("请求回复运行中异常 " , e);
+            sendButton.setEnabled(true);
+            UI.getCurrent().push();
+        }
 
     }
 

@@ -4,9 +4,9 @@ import com.chat.application.model.AsyncStatusInfo;
 
 public interface ChatResponseService {
 
-    String getChatResponseAsync(AsyncStatusInfo asyncStatusInfo);
+    void getChatResponseAsync(AsyncStatusInfo asyncStatusInfo);
 
-    String getAiResponseAsync(AsyncStatusInfo asyncStatusInfo);
+    void getAiResponseAsync(AsyncStatusInfo asyncStatusInfo);
 
     String getProviderName();
 
