@@ -70,7 +70,8 @@ public class MainLayout extends AppLayout {
     }
 
     private Footer createFooter() {
-        Footer footer = new Footer(new Text("回答仅供参考，不负法律责任"));
+        //Footer footer = new Footer(new Text("回答仅供参考，不负法律责任"));
+        Footer footer = new Footer(new Text(""));
         footer.getElement().setAttribute("theme",Lumo.DARK);
         return footer;
     }
@@ -80,15 +81,6 @@ public class MainLayout extends AppLayout {
         super.afterNavigation();
         viewTitle.setText(getCurrentPageTitle());
 
-
-//        Span span = new Span(new Text(RequestUtil.getRequestIp()));
-//
-//        FlexLayout flexLayout = new FlexLayout();
-//        flexLayout.add(span);
-//        flexLayout.setWidth("100%");
-//        flexLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-//        flexLayout.setFlexGrow(0,span);
-//        viewTitle.add(flexLayout);
     }
 
     private String getCurrentPageTitle() {

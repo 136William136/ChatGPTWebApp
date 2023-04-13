@@ -1,6 +1,7 @@
 package com.chat.application.views;
 
 import com.chat.application.constant.ContextConst;
+import com.chat.application.constant.ElementConst;
 import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
 import com.chat.application.model.AsyncStatusInfo;
@@ -26,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public abstract class AbstractChatView extends VerticalLayout implements ChatViewInterface
@@ -40,6 +43,9 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
     public List<Message> context = new ArrayList<>();
     public Button sendButton;
 
+    public Button bottomButton;
+    public volatile AtomicBoolean stayBottom = new AtomicBoolean(false);
+
     public AbstractChatView() {
         message.setPlaceholder("Enter a message... ");
         sendButton = new Button(VaadinIcon.ENTER.create(), buttonClickEvent -> {
@@ -48,16 +54,63 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
             }
         });
         sendButton.addClickShortcut(Key.ENTER);
+        sendButton.setTooltipText("发送");
 
         Button clearButton = new Button(VaadinIcon.TRASH.create(), buttonClickEvent -> {
             clearSession();
         });
+        clearButton.setTooltipText("清空");
 
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), buttonClickEvent -> {
             UI.getCurrent().getPage().reload();
         });
+        refreshButton.setTooltipText("刷新");
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(message, sendButton,refreshButton, clearButton);
+        bottomButton = new Button(VaadinIcon.ARROW_DOWN.create());
+        bottomButton.addClickListener(buttonClickEvent -> {
+            UI.getCurrent().accessSynchronously(() -> {
+                if (stayBottom.get()) {
+                    stayBottom.set(false);
+                    bottomButton.removeClassName("selected");
+                }else{
+                    stayBottom.set(true);
+                    bottomButton.addClassName("selected");
+                    if (messageList.getComponentCount() > 0) {
+                        messageList.getComponentAt(messageList.getComponentCount() - 1)
+                                .getElement().scrollIntoView(ElementConst.SmoothScroll);
+                    }
+                }
+                UI.getCurrent().push();
+            });
+        });
+
+        bottomButton.addClickShortcut(Key.ARROW_DOWN);
+        bottomButton.setTooltipText("置底");
+
+        Button revertButton = new Button(VaadinIcon.ROTATE_LEFT.create(), buttonClickEvent -> {
+            if (messageList.getComponentCount() >= 2 && context.size() >= 2) {
+                messageList.remove(messageList.getComponentAt(messageList.getComponentCount()-1));
+                messageList.remove(messageList.getComponentAt(messageList.getComponentCount()-1));
+                sendButton.setEnabled(true);
+
+                context = new ArrayList<>(context.subList(0
+                        , context.get(context.size()-1).getRole().equalsIgnoreCase("user")
+                                ? context.size()-1
+                                : context.size()-2));
+                UI.getCurrent()
+                        .getSession()
+                        .setAttribute(ContextConst.contextPrefix + getCharacterName(),context);
+                UI.getCurrent().push();
+            }
+        });
+        revertButton.setTooltipText("撤回");
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(message
+                , sendButton
+                , refreshButton
+                , bottomButton
+                , revertButton
+                , clearButton);
         horizontalLayout.setWidth("80%");
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
@@ -113,7 +166,8 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         .setUi(UI.getCurrent())
                         .setText(text1)
                         .setUiContextKey(ContextConst.contextPrefix + getCharacterName())
-                        .setButton(sendButton)
+                        .setSendButton(sendButton)
+                        .setStayBottom(stayBottom)
                         .setVaadinSession(VaadinSession.getCurrent())
                         .setIp(RequestUtil.getRequestIp())
                 ;

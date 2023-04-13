@@ -1,5 +1,6 @@
 package com.chat.application.util;
 
+import com.chat.application.constant.ElementConst;
 import com.chat.application.model.AsyncStatusInfo;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.Component;
@@ -17,7 +18,7 @@ import java.util.List;
 public class UiUtil {
 
     public static void updateCharacter(AsyncStatusInfo asyncStatusInfo, String fullContent, Message.Role role){
-        asyncStatusInfo.getButton().setEnabled(true);
+        asyncStatusInfo.getSendButton().setEnabled(true);
         asyncStatusInfo.getMessageList()
                 .add(Message.builder()
                         .role(role)
@@ -26,6 +27,7 @@ public class UiUtil {
         asyncStatusInfo.getUi().getSession()
                 .setAttribute(asyncStatusInfo.getUiContextKey()
                         , asyncStatusInfo.getMessageList());
+        scrollToBottomCheck(asyncStatusInfo);
         asyncStatusInfo.getUi().push();
         log.info("IP:[{}], 问题: [{}], 回答人: [{}], 答案: [{}]",asyncStatusInfo.getIp()
                 , asyncStatusInfo.getMessageList()
@@ -35,6 +37,11 @@ public class UiUtil {
                 , fullContent);
     }
 
+    public static void scrollToBottomCheck(AsyncStatusInfo asyncStatusInfo){
+        if (asyncStatusInfo.getStayBottom().get()){
+            asyncStatusInfo.getText().scrollIntoView(ElementConst.SmoothScroll);
+        }
+    }
     public static Component[] parseCodeSegment(String text){
         List<Component> componentList = new ArrayList<>();
         String[] textFields = text.split("```");

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 @Accessors(chain = true)
@@ -23,7 +24,9 @@ public class AsyncStatusInfo {
     private Span text;
     private String uiContextKey;
 
-    private Button button;
+    private Button sendButton;
+
+    private AtomicBoolean stayBottom;
 
     private VaadinSession vaadinSession;
 

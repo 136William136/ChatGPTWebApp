@@ -1,8 +1,10 @@
 .MessageList {
-    overflow-y: scroll;
     width: 100%;
     height: 100%;
     margin-bottom: 11%;
+    overflow: auto;
+    /*display: flex;*/
+    /*flex-direction: column-reverse;*/
 }
 
 .MessageList-name {
@@ -36,4 +38,9 @@
 
 .MessageList-bubble-currentUser {
     background-color: cadetblue;
+}
+
+.selected {
+    background-color: #007bff;
+    color: #fff;
 }

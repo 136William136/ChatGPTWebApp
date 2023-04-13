@@ -1,11 +1,13 @@
 package com.chat.application.listener;
 
+import com.chat.application.constant.ElementConst;
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.OpenaiResponse;
 import com.chat.application.util.UiUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ScrollOptions;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
@@ -48,16 +50,24 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                         codeStart = false;
                         List<Component> componentList = new ArrayList<>();
                         UiUtil.addCodeComponent(componentList, new String(codeCache));
-                        asyncStatusInfo.getText()
-                                .add(componentList
-                                .toArray(new Component[componentList.size()]));
-                        asyncStatusInfo.getUi().push();
+                        asyncStatusInfo.getUi().accessSynchronously(() -> {
+                            asyncStatusInfo.getText()
+                                    .add(componentList
+                                            .toArray(new Component[componentList.size()]));
+                            UiUtil.scrollToBottomCheck(asyncStatusInfo);
+                            asyncStatusInfo.getUi().push();
+                        });
                         codeCache = "";
                     }else if (codeStart){
-                        codeCache += info;
+                        if (!info.startsWith("`\n")) {
+                            codeCache += info;
+                        }
                     }else{
-                        asyncStatusInfo.getText().add(info);
-                        asyncStatusInfo.getUi().push();
+                        asyncStatusInfo.getUi().accessSynchronously(() -> {
+                                    asyncStatusInfo.getText().add(info);
+                                    UiUtil.scrollToBottomCheck(asyncStatusInfo);
+                                    asyncStatusInfo.getUi().push();
+                        });
                         /* 控制推送的速率 */
                         Thread.sleep(100);
                     }
@@ -67,7 +77,9 @@ public class OpenAiEventSourceListener extends EventSourceListener {
             }
         }else{
             /* 执行结束 */
-            UiUtil.updateCharacter(asyncStatusInfo, fullResult, Message.Role.ASSISTANT);
+            asyncStatusInfo.getUi().accessSynchronously(() -> {
+                UiUtil.updateCharacter(asyncStatusInfo, fullResult, Message.Role.ASSISTANT);
+            });
         }
         asyncStatusInfo.getVaadinSession().getLockInstance().unlock();
     }
@@ -75,12 +87,17 @@ public class OpenAiEventSourceListener extends EventSourceListener {
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response){
         asyncStatusInfo.getVaadinSession().getLockInstance().lock();
-        asyncStatusInfo.getButton().setEnabled(true);
-        asyncStatusInfo.getText().add("系统繁忙，请稍后再试；可以尝试清空消息或刷新页面");
+        asyncStatusInfo.getSendButton().setEnabled(true);
+        asyncStatusInfo.getText().add("系统繁忙，请稍后再试");
+        /* 清空记录 */
+        asyncStatusInfo.getMessageList().clear();
+        asyncStatusInfo.getUi().getSession()
+                .setAttribute(asyncStatusInfo.getUiContextKey(),null);
+
         asyncStatusInfo.getUi().push();
+        asyncStatusInfo.setMessageList(new ArrayList<>());
         asyncStatusInfo.getVaadinSession().getLockInstance().unlock();
         log.error("OpenAI请求失败 [{}]",response, t);
         eventSource.cancel();
     }
-
 }
