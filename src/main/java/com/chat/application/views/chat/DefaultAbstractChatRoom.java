@@ -10,7 +10,7 @@ import com.vaadin.flow.router.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-@PageTitle("聊天室")
+@PageTitle("Room - 3.5")
 @Route(value = "chatroom", layout = MainLayout.class)
 @RouteAlias(value = "",layout = MainLayout.class)
 @Slf4j

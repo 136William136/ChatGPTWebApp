@@ -16,6 +16,7 @@ public abstract class AbstractChatResponseService implements ChatResponseService
         for(Map.Entry<String, String> entry: basicConfig.getDefaultResponse().entrySet()){
             if (asyncStatusInfo.getNewText().toLowerCase().contains(entry.getKey().toLowerCase())){
                 asyncStatusInfo.getText().add(entry.getValue());
+                UiUtil.scrollToBottomCheck(asyncStatusInfo);
                 UiUtil.updateCharacter(asyncStatusInfo, entry.getValue(), Message.Role.ASSISTANT);
                 return;
             }

@@ -13,7 +13,7 @@ import com.vaadin.flow.router.RouteAlias;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-@PageTitle("聊天室2号")
+@PageTitle("Room - 4.0")
 @Route(value = "philChatRoom", layout = MainLayout.class)
 @RouteAlias(value = "phil",layout = MainLayout.class)
 @Slf4j

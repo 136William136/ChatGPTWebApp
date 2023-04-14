@@ -27,7 +27,6 @@ public class UiUtil {
         asyncStatusInfo.getUi().getSession()
                 .setAttribute(asyncStatusInfo.getUiContextKey()
                         , asyncStatusInfo.getMessageList());
-        scrollToBottomCheck(asyncStatusInfo);
         asyncStatusInfo.getUi().push();
         log.info("IP:[{}], 问题: [{}], 回答人: [{}], 答案: [{}]",asyncStatusInfo.getIp()
                 , asyncStatusInfo.getMessageList()
@@ -40,6 +39,12 @@ public class UiUtil {
     public static void scrollToBottomCheck(AsyncStatusInfo asyncStatusInfo){
         if (asyncStatusInfo.getStayBottom().get()){
             asyncStatusInfo.getText().scrollIntoView(ElementConst.SmoothScroll);
+        }
+    }
+
+    public static void scrollToBottomCheck(AsyncStatusInfo asyncStatusInfo, Component component){
+        if (asyncStatusInfo.getStayBottom().get()){
+            component.scrollIntoView(ElementConst.SmoothScroll);
         }
     }
     public static Component[] parseCodeSegment(String text){

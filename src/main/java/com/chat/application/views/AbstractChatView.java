@@ -105,9 +105,10 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         });
         revertButton.setTooltipText("撤回");
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(message
+        HorizontalLayout horizontalLayout = new HorizontalLayout(
+                refreshButton
+                , message
                 , sendButton
-                , refreshButton
                 , bottomButton
                 , revertButton
                 , clearButton);
@@ -115,10 +116,10 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
         horizontalLayout.expand(message);
-        horizontalLayout.getStyle().set("opacity","0.8");
+        horizontalLayout.getStyle().set("opacity","0.78");
         horizontalLayout.getStyle().set("background-color","white");
         horizontalLayout.getStyle().set("position","absolute");
-        horizontalLayout.getStyle().set("bottom","5%");
+        horizontalLayout.getStyle().set("bottom","4%");
         add(messageList, horizontalLayout);
     }
 

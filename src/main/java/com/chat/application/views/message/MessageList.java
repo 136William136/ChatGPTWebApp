@@ -46,6 +46,7 @@ public class MessageList extends Div {
             line.addClassName(getClass().getSimpleName() + "-row");
         }
         Scroller scroller = new Scroller(line);
+        scroller.getStyle().set("overflow-x","hidden");
         add(scroller);
         line.scrollIntoView(new ScrollOptions(ScrollOptions.Behavior.SMOOTH));
         return text1;

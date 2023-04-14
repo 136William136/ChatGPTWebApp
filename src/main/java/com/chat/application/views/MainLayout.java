@@ -36,12 +36,13 @@ public class MainLayout extends AppLayout {
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-        viewTitle = new H2();
+        viewTitle = new H2("AI Chat");
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
         Span span = new Span(ImageUtil.getAvatar(ImageConst.LOGIN)
                 ,new Html("<span>&nbsp;&nbsp;&nbsp;</span>")
                 ,new Text(RequestUtil.getRequestIp()));
+        span.getStyle().set("font-size","90%");
         span.getStyle().set("position","absolute");
         span.getStyle().set("display","flex");
         span.getStyle().set("align-items","center");
@@ -51,7 +52,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        H1 appName = new H1("AI聊天室");
+        H1 appName = new H1("AI Chat");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
         header.getElement().setAttribute("theme",Lumo.DARK);
@@ -64,14 +65,13 @@ public class MainLayout extends AppLayout {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
-        nav.addItem(new AppNavItem("聊天室", DefaultAbstractChatRoom.class, LineAwesomeIcon.GLOBE_SOLID.create()));
-        nav.addItem(new AppNavItem("聊天室2号", PhilAbstractChatRoom.class, LineAwesomeIcon.HISTORY_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 3.5", DefaultAbstractChatRoom.class, LineAwesomeIcon.GLOBE_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 4.0", PhilAbstractChatRoom.class, LineAwesomeIcon.HISTORY_SOLID.create()));
         return nav;
     }
 
     private Footer createFooter() {
-        //Footer footer = new Footer(new Text("回答仅供参考，不负法律责任"));
-        Footer footer = new Footer(new Text(""));
+        Footer footer = new Footer(new Text("The information provided is for reference only."));
         footer.getElement().setAttribute("theme",Lumo.DARK);
         return footer;
     }
