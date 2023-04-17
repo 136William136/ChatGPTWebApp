@@ -13,11 +13,9 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.apache.coyote.Request;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
@@ -31,6 +29,7 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
+        getStyle().set("background-color","whitesmoke");
     }
 
     private void addHeaderContent() {
@@ -42,13 +41,8 @@ public class MainLayout extends AppLayout {
         Span span = new Span(ImageUtil.getAvatar(ImageConst.LOGIN)
                 ,new Html("<span>&nbsp;&nbsp;&nbsp;</span>")
                 ,new Text(RequestUtil.getRequestIp()));
-        span.getStyle().set("font-size","90%");
-        span.getStyle().set("position","absolute");
-        span.getStyle().set("display","flex");
-        span.getStyle().set("align-items","center");
-        span.getStyle().set("right","1%");
-        span.getStyle().set("font-weight","bold");
-        addToNavbar(true, toggle, viewTitle,span);
+        span.addClassName("userLogo");
+        addToNavbar(false, toggle, viewTitle,span);
     }
 
     private void addDrawerContent() {
@@ -65,8 +59,8 @@ public class MainLayout extends AppLayout {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
-        nav.addItem(new AppNavItem("Room - 3.5", DefaultAbstractChatRoom.class, LineAwesomeIcon.GLOBE_SOLID.create()));
-        nav.addItem(new AppNavItem("Room - 4.0", PhilAbstractChatRoom.class, LineAwesomeIcon.HISTORY_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 3.5", ChatRoom1.class, LineAwesomeIcon.GLOBE_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 4.0", ChatRoom2.class, LineAwesomeIcon.HISTORY_SOLID.create()));
         return nav;
     }
 

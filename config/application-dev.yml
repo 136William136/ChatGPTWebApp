@@ -24,11 +24,11 @@ service:
   response:
     default: '{"小王":"对不起，我不允许透露有关小王的任何消息"}'
   prompt:
-    defaultChatRoom: "我希望你在接下来的对话中扮演小王。"
-    philChatRoom: "我希望你通过角色扮演，在接下来的对话中担任专业的哲学老师。"
+    ChatRoom1: "我希望你在接下来的对话中扮演小王。"
+    ChatRoom2: "我希望你通过角色扮演，在接下来的对话中担任专业的哲学老师。"
   model:
-    defaultChatRoom: openai:gpt-3.5-turbo
-    philChatRoom: baidu:test
+    ChatRoom1: openai:gpt-3.5-turbo
+    ChatRoom2: baidu:test
 
 
 

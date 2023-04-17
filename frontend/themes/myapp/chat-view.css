@@ -1,7 +1,7 @@
 .MessageList {
     width: 100%;
     height: 100%;
-    margin-bottom: 8%;
+    margin-bottom: 10%;
     overflow-x: hidden;
     /*display: flex;*/
     /*flex-direction: column-reverse;*/
@@ -37,10 +37,31 @@
 }
 
 .MessageList-bubble-currentUser {
-    background-color: cadetblue;
+    background-color: darkseagreen;
 }
 
 .selected {
     background-color: #007bff;
     color: #fff;
+}
+
+.bottom-message {
+    width: 80%;
+    opacity: 80%;
+    background-color: whitesmoke;
+    position: absolute;
+    bottom: 1px;
+}
+
+.userLogo {
+    font-size: 90%;
+    font-weight: bold;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    right: 1%;
+}
+
+.v-app-bar-bottom {
+    display: none;
 }

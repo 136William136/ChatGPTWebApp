@@ -11,15 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 @PageTitle("Room - 3.5")
-@Route(value = "chatroom", layout = MainLayout.class)
+@Route(value = "chatroom1", layout = MainLayout.class)
 @RouteAlias(value = "",layout = MainLayout.class)
 @Slf4j
-public class DefaultAbstractChatRoom extends AbstractChatView {
+public class ChatRoom1 extends AbstractChatView {
 
-    @Value("${service.prompt.defaultChatRoom}")
+    @Value("${service.prompt.ChatRoom1}")
     private String prompt;
 
-    @Value("${service.model.defaultChatRoom}")
+    @Value("${service.model.ChatRoom1}")
     private String model;
 
     @Override
@@ -34,12 +34,12 @@ public class DefaultAbstractChatRoom extends AbstractChatView {
 
     @Override
     public Avatar getAvatar() {
-        return ImageUtil.getAvatar(ImageConst.DEFAULTCHATROOM);
+        return ImageUtil.getAvatar(ImageConst.CHATROOM1);
     }
 
     @Override
     public String getCharacterName(){
-        return ImageConst.DEFAULTCHATROOM.getName();
+        return ImageConst.CHATROOM1.getName();
     }
 
 }

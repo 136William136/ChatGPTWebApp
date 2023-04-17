@@ -26,11 +26,9 @@ public class MessageList extends Div {
 
     public Span addMessage(String from, Avatar avatar, String text, Boolean isCurrentUser){
 
-        //Span fromContainer = new Span(new Text(from));
         Span fromContainer = new Span(new Text(""));
         fromContainer.addClassName(getClass().getSimpleName() + "-name");
 
-        //Span text1 = new Span(text);
         Span text1 = new Span(UiUtil.parseCodeSegment(text));
         Div textContainer = new Div(text1);
         textContainer.addClassName(getClass().getSimpleName() + "-bubble");

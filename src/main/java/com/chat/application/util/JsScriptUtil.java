@@ -17,9 +17,9 @@ public class JsScriptUtil {
         return content;
     }
     public static String getCodeContentScript(String textContent){
-        String backgroundColor = "#C0C0C0";
-        String content = "<pre style='background-color:"+backgroundColor+"'>" +
-                "<code style='background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
+        String backgroundColor = "#2C3E50";
+        String content = "<pre style='color:#F7F9F9;background-color:"+backgroundColor+"'>" +
+                "<code style='color:#F7F9F9;background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
         return content;
     }
 

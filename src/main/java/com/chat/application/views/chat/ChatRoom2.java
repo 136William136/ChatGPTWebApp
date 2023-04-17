@@ -6,7 +6,6 @@ import com.chat.application.util.ImageUtil;
 import com.chat.application.views.AbstractChatView;
 import com.chat.application.views.MainLayout;
 import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -14,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 @PageTitle("Room - 4.0")
-@Route(value = "philChatRoom", layout = MainLayout.class)
+@Route(value = "ChatRoom2", layout = MainLayout.class)
 @RouteAlias(value = "phil",layout = MainLayout.class)
 @Slf4j
-public class PhilAbstractChatRoom extends AbstractChatView {
-    @Value("${service.prompt.philChatRoom}")
+public class ChatRoom2 extends AbstractChatView {
+    @Value("${service.prompt.ChatRoom2}")
     private String prompt;
 
-    @Value("${service.model.philChatRoom}")
+    @Value("${service.model.ChatRoom2}")
     private String model;
 
     @Override
@@ -36,12 +35,12 @@ public class PhilAbstractChatRoom extends AbstractChatView {
     }
     @Override
     public Avatar getAvatar() {
-        return ImageUtil.getAvatar(ImageConst.PHILCHATROOM);
+        return ImageUtil.getAvatar(ImageConst.CHATROOM2);
     }
 
     @Override
     public String getCharacterName(){
-        return ImageConst.PHILCHATROOM.getName();
+        return ImageConst.CHATROOM2.getName();
     }
 
 }

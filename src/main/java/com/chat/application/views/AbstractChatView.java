@@ -112,15 +112,14 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , bottomButton
                 , revertButton
                 , clearButton);
-        horizontalLayout.setWidth("80%");
         horizontalLayout.setMargin(true);
         horizontalLayout.setSpacing(true);
         horizontalLayout.expand(message);
-        horizontalLayout.getStyle().set("opacity","0.78");
-        horizontalLayout.getStyle().set("background-color","white");
-        horizontalLayout.getStyle().set("position","absolute");
-        horizontalLayout.getStyle().set("bottom","4%");
+        horizontalLayout.addClassName("bottom-message");
         add(messageList, horizontalLayout);
+
+        /* 移除掉底部的navbarBottom 在移动设备中会显示 */
+        UI.getCurrent().getPage().executeJs("document.getElementsByTagName(\"vaadin-app-layout\")[0].shadowRoot.getElementById(\"navbarBottom\").remove()");
     }
 
     @Override
@@ -130,12 +129,7 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         UI.getCurrent().push();
 
         /* 上下文最多保留15句 */
-        if (this.context.size() > 10){
-            List<Message> tmpMessages = this.context
-                    .subList(this.context.size() - 10
-                            , this.context.size());
-            this.context = new ArrayList<>(tmpMessages);
-        }
+        checkMessageListSize();
         /* 获取上下文 */
         String text = message.getValue();
         if (CollectionUtils.isEmpty(this.context)){
@@ -161,7 +155,8 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , ""
                 , false);
 
-        AsyncStatusInfo info = new AsyncStatusInfo().setMessageList(this.context)
+        AsyncStatusInfo info = new AsyncStatusInfo()
+                        .setMessageList(this.context)
                         .setNewText(text)
                         .setModel(model)
                         .setUi(UI.getCurrent())
@@ -187,7 +182,6 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         UI.getCurrent().getPushConfiguration().setPushMode(PushMode.MANUAL);
-        /* 设置UI过期时间为5分钟 */
         Optional.ofNullable(UI.getCurrent()
                         .getSession()
                         .getAttribute(ContextConst.contextPrefix + getCharacterName()))
@@ -220,11 +214,20 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     private void clearSession(){
         messageList.setText("");
-        context = new ArrayList<>();
+        context.clear();
         UI.getCurrent()
                 .getSession()
                 .setAttribute(ContextConst.contextPrefix + getCharacterName(),null);
         sendHello();
+    }
+
+    private void checkMessageListSize(){
+        if (this.context.size() > 10){
+            List<Message> tmpMessages = this.context
+                    .subList(this.context.size() - 10
+                            , this.context.size());
+            this.context = new ArrayList<>(tmpMessages);
+        }
     }
 
 }

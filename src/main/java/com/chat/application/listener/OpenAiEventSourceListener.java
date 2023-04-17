@@ -1,18 +1,12 @@
 package com.chat.application.listener;
 
-import com.chat.application.constant.ElementConst;
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.model.OpenaiResponse;
 import com.chat.application.util.UiUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HtmlComponent;
-import com.vaadin.flow.component.ScrollOptions;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -44,23 +38,22 @@ public class OpenAiEventSourceListener extends EventSourceListener {
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String data) {
         //asyncStatusInfo.getVaadinSession().getLockInstance().lock();
-        if (!data.equals("[DONE]")){
+        if (!"[DONE]".equals(data)){
             try {
                 OpenaiResponse response = new ObjectMapper().readValue(data, OpenaiResponse.class);
                 String info = response.getChoices()
                         .get(0)
                         .getDelta()
                         .getContent();
-                //log.info("返回数据: [{}]",info);
                 if (StringUtils.isNotEmpty(info)) {
                     fullResult += info;
-                    if (info.startsWith("``") && !codeStart){
+                    if (info.trim().startsWith("``") && !codeStart){
                         codeStart = true;
                         asyncStatusInfo.getUi().accessSynchronously(() -> {
                             asyncStatusInfo.getText().add(spinner);
                             asyncStatusInfo.getUi().push();
                         });
-                    }else if (info.startsWith("``") && codeStart){
+                    }else if (info.trim().startsWith("``") && codeStart){
                         codeStart = false;
                         List<Component> componentList = new ArrayList<>();
                         UiUtil.addCodeComponent(componentList, new String(codeCache));
@@ -74,7 +67,7 @@ public class OpenAiEventSourceListener extends EventSourceListener {
                         });
                         codeCache = "";
                     }else if (codeStart){
-                        if (!info.startsWith("`\n")) {
+                        if (!info.startsWith("`\n") ){
                             codeCache += info;
                         }
                     }else{
