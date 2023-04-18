@@ -4,6 +4,7 @@ import com.chat.application.constant.ElementConst;
 import com.chat.application.model.AsyncStatusInfo;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -52,7 +53,9 @@ public class UiUtil {
         String[] textFields = text.split("```");
         for(int i=0; i< textFields.length; i++){
             if (i%2 == 0){
-                componentList.add(new Text(textFields[i]));
+                componentList.add(new Html("<span>" + textFields[i]
+                        .replaceAll("\n+","<br>")
+                        + "</span>"));
             }else{
                 addCodeComponent(componentList, textFields[i]);
             }
@@ -64,15 +67,19 @@ public class UiUtil {
         Label textLabel = new Label();
         String textContent = JsScriptUtil.codeTransfer(text);
         textLabel.getElement().setProperty("innerHTML",JsScriptUtil.getCodeContentScript(textContent));
-
         Button copyButton = new Button("copy", VaadinIcon.COPY.create());
+        addCopyButton(copyButton, componentList, text);
+        componentList.add(copyButton);
+        componentList.add(textLabel);
+    }
+
+    public static void addCopyButton(Button copyButton, List<Component> componentList, String text){
         String copyContent = text;
         copyButton.addClickListener(event -> {
             UI.getCurrent().getPage().executeJs(JsScriptUtil.copyContentScript(),copyContent);
         });
         copyButton.getStyle().set("color","black");
-        componentList.add(copyButton);
-        componentList.add(textLabel);
+
     }
 
 

@@ -1,6 +1,5 @@
 package com.chat.application.model;
 
-import com.unfbx.chatgpt.entity.chat.Message;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,10 +16,4 @@ public class OpenaiResponse extends AiResponse{
     private String model;
 
     private List<Choice> choices;
-    @Data
-    public static class Choice {
-        private Message delta;
-        private Integer index;
-        private String finish_reason;
-    }
 }

@@ -6,6 +6,7 @@ import com.chat.application.service.AbstractChatResponseService;
 import com.unfbx.chatgpt.OpenAiStreamClient;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.function.KeyRandomStrategy;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 public class OpenAiResponseServiceImpl extends AbstractChatResponseService {
     @Value("${service.key.openai}")
     private String openaiKey;
-
-    private String provider = "openai";
+    @Getter
+    private String providerName = "openai";
     @Override
     public void getAiResponseAsync(AsyncStatusInfo asyncStatusInfo){
         OpenAiStreamClient client = OpenAiStreamClient.builder()
@@ -34,11 +35,6 @@ public class OpenAiResponseServiceImpl extends AbstractChatResponseService {
                 .model(asyncStatusInfo.getModel().getModelName())
                 .build();
         client.streamChatCompletion(chatCompletion, eventSourceListener);
-    }
-
-    @Override
-    public String getProviderName() {
-        return provider;
     }
 
 }

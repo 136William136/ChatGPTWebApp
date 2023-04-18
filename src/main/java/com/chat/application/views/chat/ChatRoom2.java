@@ -9,6 +9,7 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 public class ChatRoom2 extends AbstractChatView {
     @Value("${service.prompt.ChatRoom2}")
+    @Getter
     private String prompt;
 
     @Value("${service.model.ChatRoom2}")
@@ -28,10 +30,6 @@ public class ChatRoom2 extends AbstractChatView {
         String provider = model.split(":")[0];
         String modelName = model.split(":")[1];
         return new AiModel().setModelName(modelName).setProvider(provider);
-    }
-    @Override
-    public String getPrompt(){
-        return prompt;
     }
     @Override
     public Avatar getAvatar() {

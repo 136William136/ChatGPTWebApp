@@ -7,6 +7,7 @@ import com.chat.application.views.AbstractChatView;
 import com.chat.application.views.MainLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.router.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,13 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 public class ChatRoom1 extends AbstractChatView {
 
     @Value("${service.prompt.ChatRoom1}")
+    @Getter
     private String prompt;
 
     @Value("${service.model.ChatRoom1}")
     private String model;
-
-    @Override
-    public String getPrompt(){return prompt;}
 
     @Override
     public AiModel getModel() {

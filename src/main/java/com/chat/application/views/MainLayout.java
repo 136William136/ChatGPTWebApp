@@ -29,7 +29,7 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
-        getStyle().set("background-color","whitesmoke");
+        getStyle().set("background-color","white");
     }
 
     private void addHeaderContent() {
