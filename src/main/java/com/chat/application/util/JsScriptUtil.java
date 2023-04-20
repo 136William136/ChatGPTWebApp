@@ -5,9 +5,8 @@ import java.util.regex.Pattern;
 
 public class JsScriptUtil {
 
+    private static Pattern p = Pattern.compile("(.*?)");
     public static String codeTransfer(String content){
-        String pattern = "(.*?)";
-        Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(content);
         if (m.find()){
             return content
@@ -18,7 +17,7 @@ public class JsScriptUtil {
     }
     public static String getCodeContentScript(String textContent){
         String backgroundColor = "#2C3E50";
-        String content = "<pre style='color:#F7F9F9;background-color:"+backgroundColor+"'>" +
+        String content = "<pre style='overflow:scroll;color:#F7F9F9;background-color:"+backgroundColor+"'>" +
                 "<code style='color:#F7F9F9;background-color:"+backgroundColor+"'>" + textContent + "</code></pre>";
         return content;
     }
@@ -42,6 +41,19 @@ public class JsScriptUtil {
                 "                });\n" +
                 "            }";
         return context;
+    }
+
+    public static String scrollToBottom(){
+        String script = "var content = document.getElementsByTagName('vaadin-app-layout')[0]" +
+                ".shadowRoot.querySelectorAll('*')[6];" +
+                "content.scrollTop = content.scrollHeight;";
+        return script;
+    }
+
+    public static String removeNavbarBottom(){
+        String script = "var navbarBottom = document.getElementsByTagName(\"vaadin-app-layout\")[0]" +
+                ".shadowRoot.getElementById(\"navbarBottom\"); if (navbarBottom){ navbarBottom.remove(); }";
+        return script;
     }
 
 }

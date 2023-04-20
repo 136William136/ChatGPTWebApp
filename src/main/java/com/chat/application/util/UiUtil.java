@@ -1,7 +1,7 @@
 package com.chat.application.util;
 
-import com.chat.application.constant.ElementConst;
 import com.chat.application.model.AsyncStatusInfo;
+import com.chat.application.job.TokenJob;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class UiUtil {
@@ -35,27 +36,31 @@ public class UiUtil {
                         .getContent()
                 , asyncStatusInfo.getModel().getProvider()
                 , fullContent);
+        /* 统计 */
+        if (TokenJob.ipTokens.get(asyncStatusInfo.getIp()) == null){
+            TokenJob.ipTokens.put(asyncStatusInfo.getIp(), new AtomicLong(0));
+        }
+        for(Message message: asyncStatusInfo.getMessageList()){
+            TokenJob.ipTokens.get(asyncStatusInfo.getIp()).getAndAdd(message.getContent().length());
+        }
     }
 
     public static void scrollToBottomCheck(AsyncStatusInfo asyncStatusInfo){
         if (asyncStatusInfo.getStayBottom().get()){
-            asyncStatusInfo.getText().scrollIntoView(ElementConst.SmoothScroll);
+            asyncStatusInfo.getUi().getPage().executeJs(JsScriptUtil.scrollToBottom());
         }
     }
 
-    public static void scrollToBottomCheck(AsyncStatusInfo asyncStatusInfo, Component component){
-        if (asyncStatusInfo.getStayBottom().get()){
-            component.scrollIntoView(ElementConst.SmoothScroll);
-        }
-    }
     public static Component[] parseCodeSegment(String text){
         List<Component> componentList = new ArrayList<>();
         String[] textFields = text.split("```");
         for(int i=0; i< textFields.length; i++){
             if (i%2 == 0){
-                componentList.add(new Html("<span>" + textFields[i]
-                        .replaceAll("\n+","<br>")
-                        + "</span>"));
+                componentList.add(textFields[i].contains("\n")
+                        ? new Html("<span>" + textFields[i]
+                        .replaceAll("\n+", "<br>")
+                        + "</span>")
+                        : new Text(textFields[i]));
             }else{
                 addCodeComponent(componentList, textFields[i]);
             }
@@ -68,18 +73,17 @@ public class UiUtil {
         String textContent = JsScriptUtil.codeTransfer(text);
         textLabel.getElement().setProperty("innerHTML",JsScriptUtil.getCodeContentScript(textContent));
         Button copyButton = new Button("copy", VaadinIcon.COPY.create());
-        addCopyButton(copyButton, componentList, text);
+        addCopyButton(copyButton , text);
         componentList.add(copyButton);
         componentList.add(textLabel);
     }
 
-    public static void addCopyButton(Button copyButton, List<Component> componentList, String text){
+    public static void addCopyButton(Button copyButton , String text){
         String copyContent = text;
         copyButton.addClickListener(event -> {
             UI.getCurrent().getPage().executeJs(JsScriptUtil.copyContentScript(),copyContent);
         });
         copyButton.getStyle().set("color","black");
-
     }
 
 

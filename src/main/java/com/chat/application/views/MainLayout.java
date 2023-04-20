@@ -36,7 +36,7 @@ public class MainLayout extends AppLayout {
         DrawerToggle toggle = new DrawerToggle();
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
         viewTitle = new H2("AI Chat");
-        viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+        viewTitle.addClassName("header-title");
 
         Span span = new Span(ImageUtil.getAvatar(ImageConst.LOGIN)
                 ,new Html("<span>&nbsp;&nbsp;&nbsp;</span>")
@@ -47,7 +47,7 @@ public class MainLayout extends AppLayout {
 
     private void addDrawerContent() {
         H1 appName = new H1("AI Chat");
-        appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+        appName.addClassName("header-title");
         Header header = new Header(appName);
         header.getElement().setAttribute("theme",Lumo.DARK);
         Scroller scroller = new Scroller(createNavigation());

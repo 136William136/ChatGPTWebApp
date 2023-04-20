@@ -28,6 +28,8 @@ public class AsyncStatusInfo {
 
     private AtomicBoolean stayBottom;
 
+    private AtomicBoolean isCancelled;
+
     private VaadinSession vaadinSession;
 
     private String ip;

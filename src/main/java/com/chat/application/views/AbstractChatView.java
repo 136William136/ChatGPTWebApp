@@ -7,6 +7,7 @@ import com.chat.application.model.AiModel;
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.service.ChatResponseMonitor;
 import com.chat.application.util.ImageUtil;
+import com.chat.application.util.JsScriptUtil;
 import com.chat.application.util.RequestUtil;
 import com.chat.application.views.message.MessageList;
 import com.unfbx.chatgpt.entity.chat.Message;
@@ -17,7 +18,10 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.ShadowRoot;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
@@ -28,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
@@ -42,12 +47,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     public List<Message> context = new ArrayList<>();
     public Button sendButton;
-
     public Button bottomButton;
     public volatile AtomicBoolean stayBottom = new AtomicBoolean(false);
+    public volatile AtomicBoolean isCancelled = new AtomicBoolean(false);
 
     public AbstractChatView() {
         message.setPlaceholder("Enter a message... ");
+//        message.setValueChangeMode(ValueChangeMode.LAZY);
+//        message.addClassName("message-area");
+        /* 发送按钮 */
         sendButton = new Button(VaadinIcon.ENTER.create(), buttonClickEvent -> {
             if (!StringUtils.isBlank(message.getValue())){
                 sendMessage();
@@ -56,16 +64,13 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         sendButton.addClickShortcut(Key.ENTER);
         sendButton.setTooltipText("发送");
 
-        Button clearButton = new Button(VaadinIcon.TRASH.create(), buttonClickEvent -> {
-            clearSession();
-        });
-        clearButton.setTooltipText("清空");
-
+        /* 刷新按钮 */
         Button refreshButton = new Button(VaadinIcon.REFRESH.create(), buttonClickEvent -> {
             UI.getCurrent().getPage().reload();
         });
         refreshButton.setTooltipText("刷新");
 
+        /* 置底按钮 */
         bottomButton = new Button(VaadinIcon.ARROW_DOWN.create());
         bottomButton.addClickListener(buttonClickEvent -> {
             UI.getCurrent().accessSynchronously(() -> {
@@ -75,18 +80,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 }else{
                     stayBottom.set(true);
                     bottomButton.addClassName("selected");
-                    if (messageList.getComponentCount() > 0) {
-                        messageList.getComponentAt(messageList.getComponentCount() - 1)
-                                .getElement().scrollIntoView(ElementConst.SmoothScroll);
-                    }
+                    UI.getCurrent().getPage().executeJs(JsScriptUtil.scrollToBottom());
                 }
                 UI.getCurrent().push();
             });
         });
 
-        bottomButton.addClickShortcut(Key.ARROW_DOWN);
         bottomButton.setTooltipText("置底");
 
+        /* 撤回按钮 */
         Button revertButton = new Button(VaadinIcon.ROTATE_LEFT.create(), buttonClickEvent -> {
             if (messageList.getComponentCount() >= 2 && context.size() >= 2) {
                 messageList.remove(messageList.getComponentAt(messageList.getComponentCount()-1));
@@ -100,10 +102,27 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 UI.getCurrent()
                         .getSession()
                         .setAttribute(ContextConst.contextPrefix + getCharacterName(),context);
+                /* 撤回后还会继续被推送数据，把之前的isCancelled标识为true阻断之前的推送，再将新的isCancelled指向一个新的对象*/
+                isCancelled.set(true);
+                isCancelled = new AtomicBoolean(false);
                 UI.getCurrent().push();
             }
         });
         revertButton.setTooltipText("撤回");
+
+        /* 清空按钮 */
+        Button clearButton = new Button(VaadinIcon.TRASH.create(), buttonClickEvent -> {
+            messageList.setText("");
+            context.clear();
+            isCancelled.set(true);
+            isCancelled = new AtomicBoolean(false);
+            sendButton.setEnabled(true);
+            UI.getCurrent()
+                    .getSession()
+                    .setAttribute(ContextConst.contextPrefix + getCharacterName(),null);
+            sendHello();
+        });
+        clearButton.setTooltipText("清空");
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(
                 refreshButton
@@ -119,7 +138,8 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         add(messageList, horizontalLayout);
 
         /* 移除掉底部的navbarBottom 在移动设备中会显示 */
-        UI.getCurrent().getPage().executeJs("document.getElementsByTagName(\"vaadin-app-layout\")[0].shadowRoot.getElementById(\"navbarBottom\").remove()");
+        UI.getCurrent().getPage().executeJs(JsScriptUtil.removeNavbarBottom());
+
     }
 
     @Override
@@ -128,8 +148,8 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         sendButton.setEnabled(false);
         UI.getCurrent().push();
 
-        /* 上下文最多保留15句 */
-        checkMessageListSize();
+        /* 上下文最多保留10句 */
+        reduceMessageListSize(10);
         /* 获取上下文 */
         String text = message.getValue();
         if (CollectionUtils.isEmpty(this.context)){
@@ -164,6 +184,7 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         .setUiContextKey(ContextConst.contextPrefix + getCharacterName())
                         .setSendButton(sendButton)
                         .setStayBottom(stayBottom)
+                        .setIsCancelled(isCancelled)
                         .setVaadinSession(VaadinSession.getCurrent())
                         .setIp(RequestUtil.getRequestIp())
                 ;
@@ -212,19 +233,10 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , false);
     }
 
-    private void clearSession(){
-        messageList.setText("");
-        context.clear();
-        UI.getCurrent()
-                .getSession()
-                .setAttribute(ContextConst.contextPrefix + getCharacterName(),null);
-        sendHello();
-    }
-
-    private void checkMessageListSize(){
-        if (this.context.size() > 10){
+    private void reduceMessageListSize(int sizeLimit){
+        if (this.context.size() > sizeLimit){
             List<Message> tmpMessages = this.context
-                    .subList(this.context.size() - 10
+                    .subList(this.context.size() - sizeLimit
                             , this.context.size());
             this.context = new ArrayList<>(tmpMessages);
         }

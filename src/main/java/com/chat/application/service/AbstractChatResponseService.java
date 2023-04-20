@@ -13,6 +13,15 @@ public abstract class AbstractChatResponseService implements ChatResponseService
     public BasicConfig basicConfig;
     @Override
     public void getChatResponseAsync(AsyncStatusInfo asyncStatusInfo) {
+        /* 检查IP封禁 */
+        if (basicConfig.getBlocklist().contains(asyncStatusInfo.getIp())){
+            String response = "blocked";
+            asyncStatusInfo.getText().add(response);
+            UiUtil.scrollToBottomCheck(asyncStatusInfo);
+            UiUtil.updateCharacter(asyncStatusInfo, response, Message.Role.ASSISTANT);
+            return;
+        }
+        /* 检查敏感内容 */
         for(Map.Entry<String, String> entry: basicConfig.getDefaultResponse().entrySet()){
             if (asyncStatusInfo.getNewText().toLowerCase().contains(entry.getKey().toLowerCase())){
                 asyncStatusInfo.getText().add(entry.getValue());

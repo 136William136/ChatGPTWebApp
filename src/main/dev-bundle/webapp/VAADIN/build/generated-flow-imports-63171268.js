@@ -2886,7 +2886,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div part="drawer" id="drawer" on-keydown="__onDrawerKeyDown">
         <slot name="drawer" id="drawerSlot"></slot>
       </div>
-      <div content>
+      <div content >
         <slot></slot>
       </div>
       <div part="navbar" id="navbarBottom" bottom hidden>
