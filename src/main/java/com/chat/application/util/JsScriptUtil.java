@@ -56,4 +56,17 @@ public class JsScriptUtil {
         return script;
     }
 
+    public static String updateQuotaLevel(Integer level){
+        String script = "var quota = document.getElementById('quota-level');";
+        script += "quota.classList.remove('alert');";
+        script += "quota.classList.remove('warn');";
+        if (level <= 10){
+            script += "quota.classList.add('alert');";
+        }else if (level <= 20){
+            script += "quota.classList.add('warn');";
+        }
+        script += "quota.setAttribute('style','height:"+level+"%');";
+        return script;
+    }
+
 }

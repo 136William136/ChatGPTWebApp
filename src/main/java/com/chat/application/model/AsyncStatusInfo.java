@@ -1,5 +1,6 @@
 package com.chat.application.model;
 
+import com.chat.application.service.UiService;
 import com.unfbx.chatgpt.entity.chat.Message;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,9 +30,7 @@ public class AsyncStatusInfo {
     private AtomicBoolean stayBottom;
 
     private AtomicBoolean isCancelled;
-
-    private VaadinSession vaadinSession;
-
     private String ip;
 
+    private UiService uiService;
 }

@@ -1,0 +1,66 @@
+#docker环境安装 yum-utils
+yum install -y yum-utils device-mapper-persistent-data lvm2
+
+#为yum源添加docker仓库位置
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+#安装docker
+yum install docker-ce
+
+#启动docker
+systemctl start docker
+
+#JAVA安装
+#docker pull unitfinance/jdk17-sbt-scala
+
+#MySQL安装 + 启动
+docker pull mysql:5.7
+docker run -p 3306:3306 --name mysql \
+-v /mydata/mysql/log:/var/log/mysql \
+-v /mydata/mysql/data:/var/lib/mysql \
+-v /mydata/mysql/conf:/etc/mysql \
+-e MYSQL_ROOT_PASSWORD=root \
+-d mysql:5.7
+
+#Redis安装 + 启动
+docker pull redis:6
+docker run -p 6379:6379 --name redis \
+-v /mydata/redis/data:/data \
+-d redis:6 redis-server --appendonly yes
+
+#Nginx安装 + 启动
+docker pull nginx:1.14.1
+docker run -p 80:80 --name nginx \
+-v /mydata/nginx/html:/usr/share/nginx/html \
+-v /mydata/nginx/logs:/var/log/nginx \
+-d nginx:1.14.1
+
+#Docker容器删除
+docker stop nginx
+docker rmi -f nginx
+
+#Docker镜像查看
+docker images
+
+#Docker镜像制作,把jar包和Dockerfile放在同一个目录中执行：
+docker build -t mychatbot:v3.6 --platform linux/amd64 .
+
+#mychatbot为镜像名称  v1.0是镜像版本  命令的最后有个“.” 表示在当前目录下面寻找 Dockerfile 文件
+
+#在8080启动Docker
+docker run -d -p 8081:8081 williamwei136/mychatbot:latest
+
+#查看docker运行的容器
+docker -ps
+
+#打日志
+docker logs -f <container_name>
+
+#镜像打Tag
+docker tag mychatbot:v3.6 williamwei136/mychatbot
+
+#镜像推送到账号williamwei136的dockerhub
+docker push williamwei136/mychatbot
+
+#服务器上使用镜像
+docker pull williamwei136/mychatbot

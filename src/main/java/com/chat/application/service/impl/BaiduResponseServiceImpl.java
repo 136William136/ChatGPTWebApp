@@ -1,8 +1,8 @@
 package com.chat.application.service.impl;
 
-import com.chat.application.listener.OpenAiEventSourceListener;
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.service.AbstractChatResponseService;
+import com.chat.application.service.UiService;
 import com.chat.application.util.UiUtil;
 import com.unfbx.chatgpt.entity.chat.Message;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class BaiduResponseServiceImpl extends AbstractChatResponseService {
         String response = "AI尚未引入";
         asyncStatusInfo.getText().add(response);
         UiUtil.scrollToBottomCheck(asyncStatusInfo);
-        UiUtil.updateCharacter(asyncStatusInfo, response, Message.Role.ASSISTANT);
+        super.getUiService().updateCharacter(asyncStatusInfo, response, Message.Role.ASSISTANT, false);
     }
 
 }

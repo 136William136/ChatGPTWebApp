@@ -6,6 +6,8 @@ import com.chat.application.constant.ImageConst;
 import com.chat.application.model.AiModel;
 import com.chat.application.model.AsyncStatusInfo;
 import com.chat.application.service.ChatResponseMonitor;
+import com.chat.application.service.QuotaService;
+import com.chat.application.service.UiService;
 import com.chat.application.util.ImageUtil;
 import com.chat.application.util.JsScriptUtil;
 import com.chat.application.util.RequestUtil;
@@ -27,21 +29,27 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public abstract class AbstractChatView extends VerticalLayout implements ChatViewInterface
         , BeforeEnterObserver
-        //, BeforeLeaveObserver
+        , InitializingBean
 {
     @Autowired
     private ChatResponseMonitor chatResponseMonitor;
+    @Autowired
+    private UiService uiService;
+
+    @Autowired
+    private QuotaService quotaService;
+
     public MessageList messageList = new MessageList();
     public TextField message = new TextField();
 
@@ -53,8 +61,6 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
     public AbstractChatView() {
         message.setPlaceholder("Enter a message... ");
-//        message.setValueChangeMode(ValueChangeMode.LAZY);
-//        message.addClassName("message-area");
         /* 发送按钮 */
         sendButton = new Button(VaadinIcon.ENTER.create(), buttonClickEvent -> {
             if (!StringUtils.isBlank(message.getValue())){
@@ -80,7 +86,10 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 }else{
                     stayBottom.set(true);
                     bottomButton.addClassName("selected");
-                    UI.getCurrent().getPage().executeJs(JsScriptUtil.scrollToBottom());
+                    if (messageList.getComponentCount() > 0) {
+                        messageList.getComponentAt(messageList.getComponentCount() - 1)
+                                .getElement().scrollIntoView(ElementConst.SmoothScroll);
+                    }
                 }
                 UI.getCurrent().push();
             });
@@ -139,8 +148,15 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
 
         /* 移除掉底部的navbarBottom 在移动设备中会显示 */
         UI.getCurrent().getPage().executeJs(JsScriptUtil.removeNavbarBottom());
-
     }
+
+    @Override
+    public void afterPropertiesSet() {
+        /* 展示当前额度 */
+        Integer quotaPercent = quotaService.getQuotaPercent(RequestUtil.getRequestIp());
+        UI.getCurrent().getPage().executeJs(JsScriptUtil.updateQuotaLevel(quotaPercent));
+    }
+
 
     @Override
     public void sendMessage(){
@@ -148,8 +164,6 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
         sendButton.setEnabled(false);
         UI.getCurrent().push();
 
-        /* 上下文最多保留10句 */
-        reduceMessageListSize(10);
         /* 获取上下文 */
         String text = message.getValue();
         if (CollectionUtils.isEmpty(this.context)){
@@ -185,7 +199,7 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                         .setSendButton(sendButton)
                         .setStayBottom(stayBottom)
                         .setIsCancelled(isCancelled)
-                        .setVaadinSession(VaadinSession.getCurrent())
+                        .setUiService(uiService)
                         .setIp(RequestUtil.getRequestIp())
                 ;
         try {
@@ -231,15 +245,6 @@ public abstract class AbstractChatView extends VerticalLayout implements ChatVie
                 , getAvatar()
                 , "你好！请发一些消息吧"
                 , false);
-    }
-
-    private void reduceMessageListSize(int sizeLimit){
-        if (this.context.size() > sizeLimit){
-            List<Message> tmpMessages = this.context
-                    .subList(this.context.size() - sizeLimit
-                            , this.context.size());
-            this.context = new ArrayList<>(tmpMessages);
-        }
     }
 
 }

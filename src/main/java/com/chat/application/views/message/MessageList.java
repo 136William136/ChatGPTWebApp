@@ -1,12 +1,22 @@
 package com.chat.application.views.message;
 
+import com.chat.application.service.UiService;
+import com.chat.application.util.JsScriptUtil;
 import com.chat.application.util.UiUtil;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageList extends Div {
 

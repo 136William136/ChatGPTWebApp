@@ -38,10 +38,13 @@ public class MainLayout extends AppLayout {
         viewTitle = new H2("AI Chat");
         viewTitle.addClassName("header-title");
 
-        Span span = new Span(ImageUtil.getAvatar(ImageConst.LOGIN)
+        Span span = new Span(getQuotaPercent()
+                ,new Html("<span>&nbsp;&nbsp;&nbsp;</span>")
+                ,ImageUtil.getAvatar(ImageConst.LOGIN)
                 ,new Html("<span>&nbsp;&nbsp;&nbsp;</span>")
                 ,new Text(RequestUtil.getRequestIp()));
         span.addClassName("userLogo");
+
         addToNavbar(false, toggle, viewTitle,span);
     }
 
@@ -59,8 +62,8 @@ public class MainLayout extends AppLayout {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
-        nav.addItem(new AppNavItem("Room - 3.5", ChatRoom1.class, LineAwesomeIcon.GLOBE_SOLID.create()));
-        nav.addItem(new AppNavItem("Room - 4.0", ChatRoom2.class, LineAwesomeIcon.HISTORY_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 3.5A", ChatRoom1.class, LineAwesomeIcon.GLOBE_SOLID.create()));
+        nav.addItem(new AppNavItem("Room - 3.5B", ChatRoom2.class, LineAwesomeIcon.HISTORY_SOLID.create()));
         return nav;
     }
 
@@ -80,5 +83,18 @@ public class MainLayout extends AppLayout {
     private String getCurrentPageTitle() {
         PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();
+    }
+
+    private Div getQuotaPercent(){
+
+        Div quotaLevel = new Div();
+        quotaLevel.setId("quota-level");
+        quotaLevel.addClassName("battery-level");
+
+        Div quota = new Div();
+        quota.addClassName("battery");
+        quota.add(quotaLevel);
+
+        return quota;
     }
 }

@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-@PageTitle("Room - 3.5")
+@PageTitle("Room - 3.5A")
 @Route(value = "chatroom1", layout = MainLayout.class)
 @RouteAlias(value = "",layout = MainLayout.class)
 @Slf4j
